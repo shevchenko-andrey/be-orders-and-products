@@ -1,10 +1,15 @@
-import { User } from '../auth/user.entity';
+import { User } from '../user/user.entity';
+import { IGlobalConfig } from './config.interfaces';
 
-const configuration = () => {
+const configuration = (): IGlobalConfig => {
   const {
     PORT,
     NODE_ENV,
     API_HOST,
+    ACCESS_TOKEN_SECRET,
+    ACCESS_TOKEN_EXPIRATION,
+    REFRESH_TOKEN_SECRET,
+    REFRESH_TOKEN_EXPIRATION,
     TYPEORM_PORT,
     TYPEORM_PASSWORD,
     TYPEORM_USERNAME,
@@ -15,6 +20,13 @@ const configuration = () => {
 
   return {
     port: parseInt(PORT, 10) || 8080,
+
+    accessSecretKey: ACCESS_TOKEN_SECRET,
+    accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+
+    refreshSecretKey: REFRESH_TOKEN_SECRET,
+    refreshTokenExpiration: REFRESH_TOKEN_EXPIRATION,
+
     typeOrmDatabase: {
       host: API_HOST,
       port: parseInt(TYPEORM_PORT, 10) || 5432,
@@ -24,7 +36,6 @@ const configuration = () => {
       database: TYPEORM_DATABASE,
       entities: [User],
       synchronize: isDevelopment,
-      dropSchema: isDevelopment,
     },
   };
 };
