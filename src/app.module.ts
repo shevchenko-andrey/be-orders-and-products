@@ -4,10 +4,6 @@ import { ConnectionsModule } from './connections/connections.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-<<<<<<< Updated upstream
-=======
-import { ProductModule } from './product/product.module';
->>>>>>> Stashed changes
 import configuration from './config/configuration';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessGuard } from './common/guards';
@@ -25,6 +21,8 @@ import { AccessGuard } from './common/guards';
       inject: [ConfigService],
     }),
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+    ProductModule,
+    PriceModule,
 <<<<<<< Updated upstream
 =======
     // ProductModule,

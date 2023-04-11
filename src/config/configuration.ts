@@ -1,3 +1,4 @@
+import { Product } from 'src/product/entities/product.entity';
 import { User } from '../user/user.entity';
 import { IGlobalConfig } from './config.interfaces';
 <<<<<<< Updated upstream
@@ -38,7 +39,7 @@ const configuration = (): IGlobalConfig => {
       username: TYPEORM_USERNAME,
       password: TYPEORM_PASSWORD,
       database: TYPEORM_DATABASE,
-      entities: [User],
+      entities: [User, Product, Price],
       synchronize: isDevelopment,
     },
   };
