@@ -21,10 +21,6 @@ import { AccessGuard } from './common/guards';
       inject: [ConfigService],
     }),
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    ProductModule,
-    PriceModule,
-<<<<<<< Updated upstream
-=======
     // ProductModule,
   ],
   providers: [
@@ -32,7 +28,6 @@ import { AccessGuard } from './common/guards';
       provide: APP_GUARD,
       useClass: AccessGuard,
     },
->>>>>>> Stashed changes
   ],
 })
 export class AppModule {}
