@@ -1,5 +1,9 @@
 import { User } from '../user/user.entity';
 import { IGlobalConfig } from './config.interfaces';
+<<<<<<< Updated upstream
+=======
+import { Price } from '../product/entities/price.entity';
+>>>>>>> Stashed changes
 
 const configuration = (): IGlobalConfig => {
   const {

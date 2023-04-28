@@ -3,24 +3,23 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { IGlobalConfig } from 'src/config/config.interfaces';
 import { User } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
-import { UserService } from '../user/user.service';
+import { UserService } from './../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {
+  private saltOrRounds = 10;
+
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     private userService: UserService,
-    private jwtService: JwtService,
-    private configService: ConfigService<IGlobalConfig>,
+    private tokenService: TokenService,
   ) {}
 
   async register({
@@ -34,9 +33,7 @@ export class AuthService {
       throw new ConflictException('This user already exists');
     }
 
-    const saltOrRounds = 10;
-
-    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+    const hashedPassword = await bcrypt.hash(password, this.saltOrRounds);
 
     const { id } = await this.userRepository.save({
       email,
@@ -53,6 +50,7 @@ export class AuthService {
 
   async login({ email, password }: LoginDto) {
     const user = await this.userService.findUserByEmail(email);
+
     if (user === null) {
       throw new UnauthorizedException();
     }
@@ -65,16 +63,49 @@ export class AuthService {
 
     const payload = { email, sub: user.id };
 
-    const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('accessSecretKey'),
-    });
+    const accessToken = this.tokenService.generateAccessToken(payload);
 
-    this.userRepository.update({ id: user.id }, { isLoggedId: true });
+    const refreshToken = this.tokenService.generateRefreshToken(payload);
 
-    return { accessToken };
+    await this.updateRefreshToken(refreshToken, user.id);
+
+    return { accessToken, refreshToken };
   }
 
   async logOut(userId: number): Promise<void> {
-    this.userRepository.update({ id: userId }, { isLoggedId: false });
+    this.userRepository.update({ id: userId }, { refreshToken: null });
+  }
+
+  async refreshTokens(userId: number, refreshToken: string) {
+    const user = await this.userService.findUserById(userId);
+
+    const isMatchRefreshToken = await bcrypt.compare(
+      refreshToken,
+      user.refreshToken,
+    );
+
+    if (!isMatchRefreshToken) {
+      await this.logOut(userId);
+      throw new ConflictException();
+    }
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+    };
+
+    const accessToken = this.tokenService.generateAccessToken(payload);
+
+    const newRefreshToken = this.tokenService.generateRefreshToken(payload);
+
+    await this.updateRefreshToken(newRefreshToken, user.id);
+
+    return { accessToken, refreshToken };
+  }
+
+  async updateRefreshToken(refreshToken: string, userId: number) {
+    const refreshHash = await bcrypt.hash(refreshToken, this.saltOrRounds);
+
+    this.userRepository.update({ id: userId }, { refreshToken: refreshHash });
   }
 }
