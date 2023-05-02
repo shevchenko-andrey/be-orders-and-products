@@ -14,6 +14,6 @@ export interface ITypeOrmOptions {
   username: string;
   password: string;
   database: string;
-  entities: unknown[];
+  autoLoadEntities: boolean;
   synchronize: boolean;
 }
