@@ -1,4 +1,3 @@
-import { User } from '../user/user.entity';
 import { IGlobalConfig } from './config.interfaces';
 
 const configuration = (): IGlobalConfig => {
@@ -34,7 +33,7 @@ const configuration = (): IGlobalConfig => {
       username: TYPEORM_USERNAME,
       password: TYPEORM_PASSWORD,
       database: TYPEORM_DATABASE,
-      entities: [User],
+      autoLoadEntities: true,
       synchronize: isDevelopment,
     },
   };

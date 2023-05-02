@@ -79,6 +79,10 @@ export class AuthService {
   async refreshTokens(userId: number, refreshToken: string) {
     const user = await this.userService.findUserById(userId);
 
+    if (user.refreshToken === null) {
+      throw new UnauthorizedException('Refresh token expired');
+    }
+
     const isMatchRefreshToken = await bcrypt.compare(
       refreshToken,
       user.refreshToken,

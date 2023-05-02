@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Price } from './price.entity';
 
 @Entity()
@@ -7,7 +7,7 @@ export class Product {
   id: number;
 
   @Column({ unique: true })
-  serialNumber: number;
+  serialNumber: string;
 
   @Column()
   isNew: boolean;
@@ -24,8 +24,8 @@ export class Product {
   @Column()
   specification: string;
 
-  @OneToMany(() => Price, (prices) => prices.id)
-  prices: number;
+  @OneToMany(() => Price, (prices) => prices.product)
+  prices: number | null;
 
   @Column({ default: new Date() })
   date: Date;
