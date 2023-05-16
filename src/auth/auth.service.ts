@@ -52,13 +52,13 @@ export class AuthService {
     const user = await this.userService.findUserByEmail(email);
 
     if (user === null) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Incorrect email or password');
     }
 
     const isMatchPassword = await bcrypt.compare(password, user.hashedPassword);
 
     if (!isMatchPassword) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Incorrect email or password');
     }
 
     const payload = { email, sub: user.id };

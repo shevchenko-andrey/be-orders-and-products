@@ -4,12 +4,12 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  UseGuards,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { GetCurrentUserId } from 'src/common/decorators';
-import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
+import { Cookies } from 'src/common/decorators/cookies.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
-import { RefreshGuard } from 'src/common/guards/refresh.guard';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -28,18 +28,48 @@ export class AuthController {
   @Public()
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto) {
-    return await this.authService.login(loginDto);
+  async login(
+    @Res({ passthrough: true }) res: Response,
+    @Body() loginDto: LoginDto,
+  ) {
+    const { accessToken, refreshToken } = await this.authService.login(
+      loginDto,
+    );
+
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+
+    return { accessToken };
+  }
+
+  @Post('/logout')
+  @HttpCode(HttpStatus.OK)
+  async logOut(
+    @Res({ passthrough: true })
+    res: Response,
+    @GetCurrentUserId()
+    id: number,
+  ) {
+    await this.authService.logOut(id);
+    res.clearCookie('refreshToken');
   }
 
   @Public()
-  @UseGuards(RefreshGuard)
-  @Post('/refresh')
+  @Post('/refresh-token')
   @HttpCode(HttpStatus.OK)
   async refreshTokens(
-    @GetCurrentUser('refreshToken') refreshToken: string,
-    @GetCurrentUserId() id: number,
+    @Cookies('refreshToken') oldRefreshToken: string,
+    @Res({ passthrough: true })
+    res: Response,
+    @GetCurrentUserId()
+    id: number,
   ) {
-    return await this.authService.refreshTokens(id, refreshToken);
+    const { accessToken, refreshToken } = await this.authService.refreshTokens(
+      id,
+      oldRefreshToken,
+    );
+
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+
+    return { accessToken };
   }
 }
