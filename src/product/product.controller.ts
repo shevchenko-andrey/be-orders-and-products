@@ -4,11 +4,11 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
+import { Public } from 'src/common/decorators';
 import { AddProductDto } from './dto/add-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductService } from './product.service';
@@ -17,10 +17,11 @@ import { ProductService } from './product.service';
 export class ProductController {
   constructor(private productService: ProductService) {}
 
+  @Public()
   @Get()
   async getAllProducts(
-    @Query('page', ParseIntPipe) pageNumber = 1,
-    @Query('limit', ParseIntPipe) pageSize = 10,
+    @Query('page') pageNumber = 1,
+    @Query('limit') pageSize = 10,
     @Query('type') type?: string,
     @Query('specification') specification?: string,
   ) {

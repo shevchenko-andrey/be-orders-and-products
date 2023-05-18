@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { UserRole } from 'src/common/common.interfaces';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -13,6 +14,9 @@ export class User {
 
   @Column()
   lastName: string;
+
+  @Column({ default: UserRole.USER })
+  role: UserRole;
 
   @Column()
   hashedPassword: string;
