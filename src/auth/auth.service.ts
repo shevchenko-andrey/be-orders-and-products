@@ -69,7 +69,15 @@ export class AuthService {
 
     await this.updateRefreshToken(refreshToken, user.id);
 
-    return { accessToken, refreshToken };
+    delete user.hashedPassword;
+
+    delete user.refreshToken;
+
+    return {
+      accessToken,
+      refreshToken,
+      user,
+    };
   }
 
   async logOut(userId: number): Promise<void> {

@@ -32,13 +32,13 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Body() loginDto: LoginDto,
   ) {
-    const { accessToken, refreshToken } = await this.authService.login(
+    const { accessToken, refreshToken, user } = await this.authService.login(
       loginDto,
     );
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
 
-    return { accessToken };
+    return { accessToken, user };
   }
 
   @Post('/logout')
