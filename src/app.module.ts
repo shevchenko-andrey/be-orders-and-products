@@ -9,6 +9,8 @@ import { ConnectionsModule } from './connections/connections.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 
+// TODO: add app folder and remove app.module.ts
+
 @Module({
   imports: [
     ConnectionsModule,
